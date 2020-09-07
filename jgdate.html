@@ -1,0 +1,153 @@
+<!-- jQuery date picker -->
+<!-- All copyrights by CrashSoft 2020-->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">	
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>            
+</head>
+
+<body class="w3-center">
+	<h3>Пик ап э дэйт</h3>
+	
+	<div class="w3-dropdown-click">
+		<button id = "but_d" class="jgdrop w3-button w3-round-large w3-blue" style="width:80px;" >⮛ день</button>
+		<div id="drop_d" class="w3-dropdown-content w3-bar-block w3-card-4" style="width:100px;height: 400px;overflow-y: auto">			
+		</div>
+	</div>
+	<div class="w3-dropdown-click">
+		<button class="jgdrop w3-button w3-round-large w3-blue" style="width:120px;">⮛ месяц</button>
+		<div id="drop_m" class="w3-dropdown-content w3-bar-block w3-card-4" style="width:200px;height: 400px;overflow-y: auto" >		
+		</div>
+	</div>
+	<div class="w3-dropdown-click">
+		<button class="jgdrop w3-button w3-round-large w3-blue" >⮛ god</button>
+		<div id="drop_y" class="w3-dropdown-content w3-bar-block w3-card-4"  style="width:120px;height: 400px;overflow-y: auto">
+			<a class="w3-bar-item w3-button w3-gray">🖉 свой</a>
+		</div>
+	</div>
+	<br><br>
+	Последний день месяца<input id="check_last" class="w3-check w3-round" type="checkbox">
+	<div class="w3-border-green w3-border w3-large" id="jgdate">
+	</div>
+	
+
+<script>
+	let str="";
+	let jg_date;
+	let aMonths = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+	jg_date= new Date();	
+	  	var nDay = jg_date.getDay(),
+	    nDate = jg_date.getDate(),
+	    nMonth = jg_date.getMonth(),
+	    nYear = jg_date.getFullYear(),
+	    nHour = jg_date.getHours();	
+	for (let i=2020;i<2100;i++) {
+		str=`<a class="w3-bar-item w3-button ">${i}</a>`;
+		$("#drop_y").append(str);
+	}
+
+	for (let i=0;i<12;i++) {
+		str=`<a class="w3-bar-item w3-button ">${aMonths[i]}</a>`;
+		$("#drop_m").append(str);
+	}
+	upd_jg_time();
+
+	function daysInMonth (month, year) {
+	    return new Date(year, month+1, 0).getDate();
+	}
+
+	function upd_jg_time() {		
+	    nDate = jg_date.getDate(),
+	    nMonth = jg_date.getMonth(),
+	    nYear = jg_date.getFullYear(),
+	    nHour = jg_date.getHours();
+
+		let dayz = daysInMonth(nMonth, nYear);		
+		if ($("#check_last").is(':checked'))
+			nDate=dayz;
+
+		$("#drop_d").empty();
+		for (let i=0;i<dayz;i++) {
+			str=`<a class="w3-bar-item w3-button ">${i+1}</a>`;
+			$("#drop_d").append(str);
+		}		
+
+    	$("#drop_d a:eq("+(nDate-1)+")").toggleClass(" w3-red",true);
+    	$("#drop_m a").toggleClass(" w3-red",false);			
+    	$("#drop_m a:eq("+nMonth+")").toggleClass(" w3-red",true);
+    	$("#drop_y a").toggleClass(" w3-red",false);			
+    	//$("#drop_y a:eq("+nYear+")").toggleClass(" w3-red",true);    	    	
+    	let yr= nYear-2019;
+    	$("#drop_y a:eq("+yr+")").toggleClass(" w3-red",true);    	    	
+
+		$("#drop_d").prev().html("⮛ "+nDate);
+		$("#drop_m").prev().html("⮛ "+aMonths[nMonth]);
+		$("#drop_y").prev().html("⮛ "+nYear);
+		$("#jgdate").html(jg_date);
+	}
+
+
+	$(function() {
+		$(document).on('click','#drop_d a',function (e) {			
+			let i = parseInt($('#drop_d a').index(this)+1);
+			jg_date= new Date(nYear, nMonth, i);
+			upd_jg_time();
+		});
+
+		$(document).on('click','#drop_m a',function (e) {			
+			let i = $('#drop_m a').index(this);			
+			jg_date= new Date(nYear, i, nDate);
+			nMonth = jg_date.getMonth();									
+			if (nMonth != i) {				//stay in a last day of month				
+				jg_date= new Date(nYear, i, daysInMonth(i, nYear));				
+			}
+			upd_jg_time();
+		});
+
+		$(document).on('click','#drop_y a',function (e) {									
+			if ($('#drop_y a').index(this) == 0) {
+				let yr = parseInt(prompt("Enter the year between 1900 and 2100", nYear));				
+				if (yr>1900 && yr < 2100)  {
+					nYear=yr;
+					jg_date= new Date(yr, nMonth, nDate);
+				}
+				else alert ("Year out of range");
+			}
+			else {
+				let i = parseInt($(this).html());
+				jg_date= new Date(i, nMonth, nDate);
+			}
+			upd_jg_time();
+		});
+
+		$(".jgdrop").click(function(e){
+			$(".jgdrop").next().hide();
+			$(this).next().show();
+			// Close dropdown if we click outside
+		    $('html').click(function(event) {		        
+		        if ($(event.target).closest('.jgdrop').length==0) {
+		        	$(".jgdrop").next().hide();            
+		            $(this).unbind(event);
+		        }
+		    })
+
+		});
+
+		$("#check_last").change(function(e){
+			jg_date= new Date(nYear, nMonth, daysInMonth(nMonth, nYear));
+			$("#check_last").is(':checked') ? $("#but_d").prop("disabled", true): $("#but_d").prop("disabled", false);			
+			upd_jg_time();
+		});
+		  
+	});
+
+</script>
+
+</body>
+</html>
